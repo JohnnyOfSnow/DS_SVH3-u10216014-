@@ -135,7 +135,7 @@ public class ChooseApplet extends JApplet {
 		public void actionPerformed(ActionEvent e){
 			if(e.getSource() == btnNewButton){
 				JFileChooser fileChooser = new JFileChooser();
-				if (fileChooser.showOpenDialog(null)== JFileChooser.APPROVE_OPTION) {
+				if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 					// Get the selected file
 					java.io.File file = fileChooser.getSelectedFile();
 					try {
@@ -153,21 +153,28 @@ public class ChooseApplet extends JApplet {
 				}// end inner if
 			
 			}else if(e.getSource() == btnNewButton_1){
-				String check = " "; 
-				if(textField.getText() == check || textField_1.getText() == check){
-					System.out.println("Checked.");
-				} else {
-					System.out.println("Not Checked.");
-					String schoolNumber = textField.getText();
-					String name = textField_1.getText();
-					frame.dispose();
-					QuestionApplet a = new QuestionApplet(schoolNumber, name);
-					a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				}		
+				canOpenQuestionWindow();
+				
 			}else{
 				System.out.println("A error occur for the class ButtonListener inside a method actionPerformed");
 			}// end if
 		}// end method actionPerformed
+
+		public void canOpenQuestionWindow(){
+			String check = null;
+			String schoolNumber = String.valueOf(textField.getText());
+			String name = String.valueOf(textField_1.getText()); 
+			if(schoolNumber.equals(check)){
+				System.out.println("Checked.");
+			}else if(name.equals(check)){
+				System.out.println("Checked.");
+			}else{
+				System.out.println("Not Checked.");
+				frame.dispose();
+				QuestionApplet a = new QuestionApplet(schoolNumber, name);
+				a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}		
+		}
 	}// end inner class ButtonListener
 }// end the public class ChooseApplet
 
@@ -182,7 +189,13 @@ class QuestionApplet extends JFrame {
 	static JTextArea textArea; // A textfield will display a question from a file.
 	static JTextArea textArea_1; // A textfield for user can input answer.
 	static JTextArea textArea_2; // A textfield for display the condition of answering question.
-
+	JButton btnNewButton = new JButton("\u4F5C\u7B54\u78BA\u8A8D\u9375"); // A check button.
+	JButton btnNewButton_1 = new JButton("\u4E0B\u4E00\u984C"); // A next button.
+	JButton btnNewButton_2 = new JButton("\u9032\u5165\u4F5C\u7B54\u89E3\u8AAA\u756B\u9762"); // A enter a review button.
+	static int isNext = 0; // Judge the user whether click the next question button.
+	static int isCheck = 1; // Judge the user whether click the check question button.
+	static int chooseQuestion = 0;
+	static int realCapacity = 0;
 
 	/**
 	 * Create the applet.
@@ -232,7 +245,7 @@ class QuestionApplet extends JFrame {
 		textArea_1.setBounds(10, 299, 787, 68);
 		panel.add(textArea_1);
 		
-		JButton btnNewButton = new JButton("\u4F5C\u7B54\u78BA\u8A8D\u9375");
+		
 		btnNewButton.setBounds(640, 377, 157, 33);
 		panel.add(btnNewButton);
 		
@@ -258,11 +271,11 @@ class QuestionApplet extends JFrame {
 		textArea.setEditable(false);
 		scrollPane_1.setViewportView(textArea);
 		
-		JButton btnNewButton_1 = new JButton("\u4E0B\u4E00\u984C");
+		
 		btnNewButton_1.setBounds(640, 553, 157, 33);
 		panel.add(btnNewButton_1);
 		
-		JButton btnNewButton_2 = new JButton("\u9032\u5165\u4F5C\u7B54\u89E3\u8AAA\u756B\u9762");
+		
 		btnNewButton_2.setBounds(10, 549, 147, 41);
 		panel.add(btnNewButton_2);
 		
@@ -326,19 +339,19 @@ class QuestionApplet extends JFrame {
 		setVisible(true);
 		try {
 			setCapacity();
-			int chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
+			chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
 			while(chooseQuestion == 0) {
 				chooseQuestion = (int)(Math.random() * capacityForInt);
 			}
-			System.out.println("Ramdom result is " + chooseQuestion);
 			handleQuestion test1 = new handleQuestion();
 			textArea.setText(test1.giveQuestion(chooseQuestion));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
+		btnNewButton.addActionListener(new ButtonListener()); // Register listener.
+		btnNewButton_1.addActionListener(new ButtonListener()); // Register listener.
+		btnNewButton_2.addActionListener(new ButtonListener()); // Register listener.
 	}
 
 	public void setCapacity() throws Exception{
@@ -351,6 +364,7 @@ class QuestionApplet extends JFrame {
 				capacityForString = input.next(); // Read items
 			}
 			capacityForInt = Integer.parseInt(capacityForString); // String to integer.
+			realCapacity = capacityForInt;
 			input.close(); // Close the file.
 			
 		} else {
@@ -359,8 +373,74 @@ class QuestionApplet extends JFrame {
 	}
 
 	public int getCapacity(){
-		return capacityForInt;
+		return realCapacity;
+	} // store the number how many question.
+
+	public int getRandom(){
+		int useCapacity = getCapacity();
+		int whichQuestion = (int)(Math.random() * useCapacity) + 1; // choose a question for random.
+		while(chooseQuestion == 0) {
+			chooseQuestion = (int)(Math.random() * useCapacity);
+		}
+		setChooseQuestion(whichQuestion);
+		return chooseQuestion;
+	}// work for random a number.
+
+	public void setChooseQuestion(int newChoose){
+		chooseQuestion = newChoose;
+	}// set the question number.
+
+	// A class is responsible for action presentation.
+	private class ButtonListener implements ActionListener{
+		
+		@Override
+		public void actionPerformed(ActionEvent e){
+			if(e.getSource() == btnNewButton){
+				if(isCheck == 1){
+					System.out.println("you check the answer.");
+					System.out.println("Now you click the next button");
+					isNext = 1;
+					isCheck = 0;
+
+					handleQuestion test1 = new handleQuestion();
+					String userAnswer = textArea_1.getText();
+					String[] alreadyUserAnswer = test1.handleAnswer(userAnswer);
+					
+					String answer = test1.getAnswer(chooseQuestion);
+					String[] alreadyAnswer = test1.handleAnswer(answer);
+					
+					String result = test1.correspondAnswer(alreadyAnswer, alreadyUserAnswer);
+					textArea_2.setText(result);
+
+				}else{
+					System.out.println("You cannot click the check answer button, because you have checked.");
+					
+				}
+			}else if(e.getSource() == btnNewButton_1){
+				if(isNext == 1){
+					System.out.println("you check the next button");
+					System.out.println("Now you answer the next question.");
+					handleQuestion test1 = new handleQuestion();
+					textArea.setText(test1.giveQuestion(getRandom()));
+					textArea_1.setText("");
+					textArea_2.setText("");
+					isNext = 0;
+					isCheck = 1;
+				}else{
+					System.out.println("You cannot click the next button, because you havenot answer the question.");
+					
+					
+				}
+
+			}else if(e.getSource() == btnNewButton_2){
+
+			}else{
+				System.out.println("A error occur for the class ButtonListener inside a method actionPerformed");
+			}
+		}
+
 	}
+
 }
 
 /**
