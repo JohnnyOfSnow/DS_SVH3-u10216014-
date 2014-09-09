@@ -1,6 +1,7 @@
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.ButtonGroup;
 import java.awt.*;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
@@ -25,9 +26,10 @@ public class ChooseApplet extends JApplet {
 	private JTextField textField_1;
 	JButton btnNewButton = new JButton("\u4E0A\u6B21\u4F5C\u7B54\u89E3\u8AAA");
 	JButton btnNewButton_1 = new JButton("\u958B\u59CB\u4F5C\u7B54");
-	JRadioButton rdbtnNewRadioButton = new JRadioButton("\u96A8\u6A5F\u51FA\u984C");
-	JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("\u9806\u5E8F\u51FA\u984C");
+	JRadioButton rdbtnNewRadioButton = new JRadioButton("\u96A8\u6A5F\u51FA\u984C",true);
+	JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("\u9806\u5E8F\u51FA\u984C",false);
 	static JFrame frame;
+	static int mode = 1;
 	
 	// In order to run standalone as a standalone application, we add the main method.
 	public static void main(String[] args) {
@@ -118,6 +120,10 @@ public class ChooseApplet extends JApplet {
 		
 		rdbtnNewRadioButton_1.setBounds(195, 183, 107, 23);
 		panel.add(rdbtnNewRadioButton_1);
+
+		ButtonGroup group = new ButtonGroup(); // A button group we use in order to tight two radioButton.
+		group.add(rdbtnNewRadioButton);
+		group.add(rdbtnNewRadioButton_1);
 		
 		JLabel lblNewLabel_8 = new JLabel("\u51FA\u984C\u65B9\u5F0F\u53EF\u9078\u64C7\u96A8\u6A5F\u6216\u662F\u9806\u5E8F");
 		lblNewLabel_8.setBounds(159, 87, 233, 15);
@@ -125,8 +131,9 @@ public class ChooseApplet extends JApplet {
 
 		btnNewButton.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_1.addActionListener(new ButtonListener()); // Register listener.
-
-	}
+		rdbtnNewRadioButton.addActionListener(new ButtonListener()); // Register listener.
+		rdbtnNewRadioButton_1.addActionListener(new ButtonListener()); // Register listener.
+	}// end constructer ChooseApplet()
 
 	// A class is responsible for action presentation.
 	private class ButtonListener implements ActionListener{
@@ -155,6 +162,11 @@ public class ChooseApplet extends JApplet {
 			}else if(e.getSource() == btnNewButton_1){
 				canOpenQuestionWindow();
 				
+			}else if(e.getSource() == rdbtnNewRadioButton){
+				mode = 1; // Random mode
+
+			}else if(e.getSource() == rdbtnNewRadioButton_1){
+				mode = 2; // Sequence mode
 			}else{
 				System.out.println("A error occur for the class ButtonListener inside a method actionPerformed");
 			}// end if
@@ -171,7 +183,7 @@ public class ChooseApplet extends JApplet {
 			}else{
 				System.out.println("Not Checked.");
 				frame.dispose();
-				QuestionApplet a = new QuestionApplet(schoolNumber, name);
+				QuestionApplet a = new QuestionApplet(schoolNumber, name, mode);
 				a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}		
 		}
@@ -196,11 +208,12 @@ class QuestionApplet extends JFrame {
 	static int isCheck = 1; // Judge the user whether click the check question button.
 	static int chooseQuestion = 0;
 	static int realCapacity = 0;
+	static int setMode = 1; // 1 is random mode, 2 is sequence mode.
 
 	/**
 	 * Create the applet.
 	 */
-	public QuestionApplet(String schoolNumber, String name){
+	public QuestionApplet(String schoolNumber, String name, int mode){
 
 
 		super("A Question window.");
@@ -337,6 +350,18 @@ class QuestionApplet extends JFrame {
 
 		setSize(807,700);
 		setVisible(true);
+
+		if(mode == 1){
+			lblNewLabel_5.setText("Random mode");
+			setMode = 1;
+		}else if(mode == 2){
+			lblNewLabel_5.setText("Sequence mode");
+			setMode = 2;
+		}else{
+			lblNewLabel_5.setText("No mode");
+			setMode = 1;
+		}
+
 		try {
 			setCapacity();
 			chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
@@ -542,25 +567,28 @@ class handleQuestion{
 		return connectQuestion;			
 	}// end method giveQuestion
 
-	
-
 	static String[] handleAnswer(String needSeparate){
 		String[] firstHandleAnswer = needSeparate.split(","); // First we use , to devide the every blank answer.
 		return firstHandleAnswer;
 	}// end method handleAnswer
 
 	static String correspondAnswer(String[] correctAnswer, String[] userAnswer){
+		/**
+		 *	A case: when user answer is not enougth. 
+		 *			We should fill the lack of blank.(fill by "null")
+		 *
+		 */
 		String[] methodUseUserAnswer = new String[correctAnswer.length];
 		int max = userAnswer.length - 1;
 		for(int i = 0; i < correctAnswer.length; i++){
 			if(i > max){
-				methodUseUserAnswer[i] = "null";
+				methodUseUserAnswer[i] = "null"; // the lack of blank filled by null
 			}else{
 				methodUseUserAnswer[i] = userAnswer[i];
 			}		
 		}
 		
-		String[] gradeArray = gradeString.split(",");
+		String[] gradeArray = gradeString.split(","); // Use the grade string, and ready to give point.
 		int[] gradeIntArray = new int[gradeArray.length];
 		for (int i = 0; i < gradeArray.length; i++){
 			gradeIntArray[i] = Integer.parseInt(gradeArray[i]);
@@ -599,5 +627,5 @@ class handleQuestion{
 		int oldGrade = Integer.parseInt(grade);
 		int newGrade = oldGrade + grade1;
 		grade = String.valueOf(newGrade);
-	}
+	}// emd method setGrade
 }// end class handleQuestion
