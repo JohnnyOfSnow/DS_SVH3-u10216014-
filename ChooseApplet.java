@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import javax.swing.JRadioButton;
 import java.io.*;
 import java.util.Scanner;
+import java.util.Date;
 
 
 public class ChooseApplet extends JApplet {
@@ -90,13 +91,13 @@ public class ChooseApplet extends JApplet {
 		panel.add(btnNewButton);
 		
 		textField = new JTextField();
-		textField.setText("");
+		textField.setText("school id");
 		textField.setBounds(79, 225, 313, 21);
 		panel.add(textField);
 		textField.setColumns(10);
 		
 		textField_1 = new JTextField();
-		textField_1.setText("");
+		textField_1.setText("name");
 		textField_1.setBounds(79, 262, 313, 21);
 		panel.add(textField_1);
 		textField_1.setColumns(10);
@@ -210,12 +211,12 @@ class QuestionApplet extends JFrame {
 	static int realCapacity = 0;
 	static int setMode = 1; // 1 is random mode, 2 is sequence mode.
 	static boolean end = false;
+	static String fileName = "name.txt";
 
 	/**
 	 * Create the applet.
 	 */
 	public QuestionApplet(String schoolNumber, String name, int mode){
-
 
 		super("A Question window.");
 		
@@ -352,6 +353,18 @@ class QuestionApplet extends JFrame {
 		setSize(807,700);
 		setVisible(true);
 
+		setFileName(name); // set the file name.
+		establishFile(getFileName()); // create a file which is written the qusetion and condition of answering question.
+		
+
+		Date day = new Date(); // A Date object is created, and the object name is day. 
+		String day1 = day.toString(); // "day" can invoke a method toString() will get a current time string.
+		StringBuilder stringBuilderForConnectFileName = new StringBuilder();
+		stringBuilderForConnectFileName.append("school id: " + schoolNumber + " name is: " + name + "\r\n");
+		stringBuilderForConnectFileName.append("The time starts quiz is: " + day1);
+		String initialization = new String(stringBuilderForConnectFileName);
+		requireFileWriteData(getFileName(), initialization);
+
 		if(mode == 1){
 			lblNewLabel_5.setText("Random mode");
 			setMode = 1;
@@ -384,11 +397,10 @@ class QuestionApplet extends JFrame {
 			setMode = 1;
 		}
 
-		
 		btnNewButton.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_1.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_2.addActionListener(new ButtonListener()); // Register listener.
-	}
+	}// end constructer (String schoolNumber, String name, int mode)
 
 	public void setCapacity() throws Exception{
 		java.io.File file = new java.io.File("capacity.txt"); // A file use to tell the program how many question do we have.
@@ -405,7 +417,7 @@ class QuestionApplet extends JFrame {
 		} else {
 			dispose();
 		}	
-	}
+	}// end method setCapacity()
 
 	public int getCapacity(){
 		return realCapacity;
@@ -413,7 +425,7 @@ class QuestionApplet extends JFrame {
 
 	public static boolean checkCapacity(int compare){
 		return compare <= realCapacity;
-	}
+	} // No matter the random or sequence mode maybe out of range(the total number of question), so we check.
 
 	public int getRandom(){
 		int useCapacity = getCapacity();
@@ -428,6 +440,55 @@ class QuestionApplet extends JFrame {
 	public void setChooseQuestion(int newChoose){
 		chooseQuestion = newChoose;
 	}// set the question number.
+
+	public static void setFileName(String newFileName){
+		StringBuilder stringBuilderForConnectFileName = new StringBuilder();
+		stringBuilderForConnectFileName.append(newFileName + ".txt");
+		fileName = new String(stringBuilderForConnectFileName);
+	}// set the file name.
+
+	public static String getFileName(){
+		return fileName;
+	}// get the file name.
+
+	static void establishFile(String fileName){
+		File file = new File(fileName);
+		if(!file.exists()){
+    		try {
+        		file.createNewFile(); // create a file and the file name is required by the method's parameter.
+
+    		} catch (IOException e) {
+        		// TODO Auto-generated catch block
+        		e.printStackTrace();
+    		}
+    	}else{
+    	}
+	}// end method establishFile.
+
+	static void requireFileWriteData(String fileName, String data1){
+
+			FileWriter fw = null;
+
+			try{
+				fw = new FileWriter(fileName, true); // true: does not overwrite the previous contents.
+				fw.write(data1 + "\r\n");
+			}// end try
+			catch(IOException e) {}
+			finally {
+				try {
+					fw.close();
+				}// end try
+
+				catch(IOException e) {}
+			}// end finally
+	}// end method requireFileWriteData.
+
+	static String connectStringForInputFile(String question, String condition){
+		StringBuilder stringBuilderForConnectStringForInput = new StringBuilder();
+		stringBuilderForConnectStringForInput.append(question + "\r\n" + condition);
+		String readyInputTofile = new String(stringBuilderForConnectStringForInput);
+		return readyInputTofile;
+	}// end method connectStringForInputFile.
 
 	// A class is responsible for action presentation.
 	private class ButtonListener implements ActionListener{
@@ -461,17 +522,20 @@ class QuestionApplet extends JFrame {
 
 				}else{
 					if(isNext == 1){
+						handleQuestion test1 = new handleQuestion();
+						String combinatedString = connectStringForInputFile(test1.getFileInputQuestion(), textArea_2.getText());
+						requireFileWriteData(getFileName(), combinatedString);
 						System.out.println("you check the next button");
 						System.out.println("Now you answer the next question.");
 						if(setMode == 1){
-							handleQuestion test1 = new handleQuestion();
+							
 							textArea.setText(test1.giveQuestion(getRandom()));
 							textArea_1.setText("");
 							textArea_2.setText("");
 							isNext = 0;
 							isCheck = 1;
 						}else if(setMode == 2){
-							handleQuestion test1 = new handleQuestion();
+							
 							chooseQuestion = chooseQuestion + 1;
 							if(checkCapacity(chooseQuestion)){
 								textArea.setText(test1.giveQuestion(chooseQuestion));
@@ -509,8 +573,8 @@ class QuestionApplet extends JFrame {
  *			2.	handleAnswer    For the answer split, and return a string array.
  *			3.	setFileInputQuestion	Set a question string for input to a file.
  *			4.	getFileInputQuestion	Get a question string for input to a file.
- *			5.  	setGradeString	Set a grade string.
- *			6.  	getGradeString	Get a grade string when the correspondAnswer method called.
+ *			5.	setGradeString	Set a grade string.
+ *			6.	getGradeString	Get a grade string when the correspondAnswer method called.
  *			7.	setAnswerString	Set a answer string.
  *			8.	getAnswerString	Get a answer string when the correspondAnswer method called.
  *			9.	setGrade  Set the user currently grade.
@@ -560,7 +624,7 @@ class handleQuestion{
 					stringBuilderForQuestion.delete(0, stringForQuestion.length()); // clear the StringBuilder.
 					times = times + 1;
 				} else {	
-					stringBuilderForQuestion.append(data + "\n"); // connect the long question.
+					stringBuilderForQuestion.append(data + "\r\n"); // connect the long question.
 				}
 			}
 			String[] splitForGrade = question.split("@");
@@ -620,7 +684,7 @@ class handleQuestion{
 		wholeQuestion = input;
 	}
 
-	public String getFileInputQuestion(){
+	public static String getFileInputQuestion(){
 		return wholeQuestion;
 	}
 
@@ -678,14 +742,14 @@ class handleQuestion{
 			while(innerCount < correctIndividualAnswer.length && isCorrect == false){
 				if(methodUseUserAnswer[count].equals(correctIndividualAnswer[innerCount])) {
 					isCorrect = true;
-					stringBuilderForResult.append("Your answer " + methodUseUserAnswer[count] + " in the " + blank + " is correct." + "\n");
+					stringBuilderForResult.append("Your answer " + methodUseUserAnswer[count] + " in the " + blank + " is correct." + "\r\n");
 					innerGrade = innerGrade + gradeIntArray[count];
 				}
 				innerCount = innerCount + 1;
 			}
 
 			if(isCorrect == false){
-				stringBuilderForResult.append("Your answer " + methodUseUserAnswer[count] + " in the " + blank + " is wrong." + "\n");
+				stringBuilderForResult.append("Your answer " + methodUseUserAnswer[count] + " in the " + blank + " is wrong." + "\r\n");
 			}
 			count = count + 1; // Control the answer array.
 			blank = blank + 1; // Variable for which one blank.
@@ -700,10 +764,9 @@ class handleQuestion{
 		int oldGrade = Integer.parseInt(grade);
 		int newGrade = oldGrade + grade1;
 		grade = String.valueOf(newGrade);
-	}// emd method setGrade
+	}// end method setGrade
 
 	public String getGrade(){
 		return grade;
-	}
-
+	}// end method getGrade
 }// end class handleQuestion
