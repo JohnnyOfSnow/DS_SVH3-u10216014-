@@ -206,9 +206,10 @@ class QuestionApplet extends JFrame {
 	JButton btnNewButton_2 = new JButton("\u9032\u5165\u4F5C\u7B54\u89E3\u8AAA\u756B\u9762"); // A enter a review button.
 	static int isNext = 0; // Judge the user whether click the next question button.
 	static int isCheck = 1; // Judge the user whether click the check question button.
-	static int chooseQuestion = 0;
+	static int chooseQuestion = 1;
 	static int realCapacity = 0;
 	static int setMode = 1; // 1 is random mode, 2 is sequence mode.
+	static boolean end = false;
 
 	/**
 	 * Create the applet.
@@ -354,26 +355,36 @@ class QuestionApplet extends JFrame {
 		if(mode == 1){
 			lblNewLabel_5.setText("Random mode");
 			setMode = 1;
+			try {
+				setCapacity();
+				chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
+				while(chooseQuestion == 0) {
+					chooseQuestion = (int)(Math.random() * capacityForInt);
+				}
+				handleQuestion test1 = new handleQuestion();
+				textArea.setText(test1.giveQuestion(chooseQuestion));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}else if(mode == 2){
 			lblNewLabel_5.setText("Sequence mode");
 			setMode = 2;
+			try {
+				setCapacity();
+
+				handleQuestion test1 = new handleQuestion();
+				textArea.setText(test1.giveQuestion(chooseQuestion));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}else{
 			lblNewLabel_5.setText("No mode");
 			setMode = 1;
 		}
 
-		try {
-			setCapacity();
-			chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
-			while(chooseQuestion == 0) {
-				chooseQuestion = (int)(Math.random() * capacityForInt);
-			}
-			handleQuestion test1 = new handleQuestion();
-			textArea.setText(test1.giveQuestion(chooseQuestion));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		btnNewButton.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_1.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_2.addActionListener(new ButtonListener()); // Register listener.
@@ -399,6 +410,10 @@ class QuestionApplet extends JFrame {
 	public int getCapacity(){
 		return realCapacity;
 	} // store the number how many question.
+
+	public static boolean checkCapacity(int compare){
+		return compare <= realCapacity;
+	}
 
 	public int getRandom(){
 		int useCapacity = getCapacity();
@@ -430,30 +445,54 @@ class QuestionApplet extends JFrame {
 					String userAnswer = textArea_1.getText();
 					String[] alreadyUserAnswer = test1.handleAnswer(userAnswer);
 					
-					String answer = test1.stringForAnswer;
+					String answer = test1.getAnswerString();
 					String[] alreadyAnswer = test1.handleAnswer(answer);
 					
 					String result = test1.correspondAnswer(alreadyAnswer, alreadyUserAnswer);
 					textArea_2.setText(result);
-					lblNewLabel_22.setText(test1.grade);
+					lblNewLabel_22.setText(test1.getGrade());
 
 
 				}else{
 					System.out.println("You cannot click the check answer button, because you have checked.");					
 				}
 			}else if(e.getSource() == btnNewButton_1){
-				if(isNext == 1){
-					System.out.println("you check the next button");
-					System.out.println("Now you answer the next question.");
-					handleQuestion test1 = new handleQuestion();
-					textArea.setText(test1.giveQuestion(getRandom()));
-					textArea_1.setText("");
-					textArea_2.setText("");
-					isNext = 0;
-					isCheck = 1;
+				if(end){
+
 				}else{
-					System.out.println("You cannot click the next button, because you havenot answer the question.");		
-				}
+					if(isNext == 1){
+						System.out.println("you check the next button");
+						System.out.println("Now you answer the next question.");
+						if(setMode == 1){
+							handleQuestion test1 = new handleQuestion();
+							textArea.setText(test1.giveQuestion(getRandom()));
+							textArea_1.setText("");
+							textArea_2.setText("");
+							isNext = 0;
+							isCheck = 1;
+						}else if(setMode == 2){
+							handleQuestion test1 = new handleQuestion();
+							chooseQuestion = chooseQuestion + 1;
+							if(checkCapacity(chooseQuestion)){
+								textArea.setText(test1.giveQuestion(chooseQuestion));
+								textArea_1.setText("");
+								textArea_2.setText("");
+								isNext = 0;
+								isCheck = 1;
+							}else{
+								textArea.setText("All question have answered");
+								textArea_1.setText("Please click the analysis button.");
+								textArea_2.setText("Please click the analysis button.");
+								end = true;
+							}
+						
+						}else{
+							System.out.println("A error occur for setMode choose.");
+						} // end if for mode(sequence or random)		
+					}else{
+						System.out.println("You cannot click the next button, because you havenot answer the question.");		
+					}// end if for whether the next button can click or not.
+				} // end if for whether all questions have answered.	
 			}else if(e.getSource() == btnNewButton_2){
 
 			}else{
@@ -467,22 +506,30 @@ class QuestionApplet extends JFrame {
  *  The class handleQuestion will take responsible for Question and answer.
  *		Have the following method.
  *			1.	giveQuestion	Read the file, and return a question which program requires.
- *			3.	handleAnswer    For the answer split, and return a string array.
- *			4.	correspondAnswer	The method will gain two array(One is answer, another is user answer),
+ *			2.	handleAnswer    For the answer split, and return a string array.
+ *			3.	setFileInputQuestion	Set a question string for input to a file.
+ *			4.	getFileInputQuestion	Get a question string for input to a file.
+ *			5.  	setGradeString	Set a grade string.
+ *			6.  	getGradeString	Get a grade string when the correspondAnswer method called.
+ *			7.	setAnswerString	Set a answer string.
+ *			8.	getAnswerString	Get a answer string when the correspondAnswer method called.
+ *			9.	setGrade  Set the user currently grade.
+ *			10.	getGrade  Get the user currently grade.
+ *			11.	correspondAnswer	The method will gain two array(One is answer, another is user answer),
  *									and return a string for the condition of answering question.
  *		Have the following variable.
  *			1.	gradeString		Read the file, spilt by the @, hold the question every blank's grade.
  *			2.	stringForAnswer Read the file, spilt by the #, hold the question every blank's answer.
  *			3.	wholeQuestion	Read the file, it will store to a file when the question that user answer.
- *			4.	grade           When the user qnswer, the variable will record the grade.
+ *			4.	grade           When the user qnswer, the variable will record the grade, it will display on a JLabel.
  *
  *
  */
 class handleQuestion{
-	static String gradeString = "";
-	static String stringForAnswer = "";
-	static String wholeQuestion = "";
-	static String grade = "0";
+	private static String gradeString = "";
+	private static String stringForAnswer = "";
+	private static String wholeQuestion = "";
+	private static String grade = "0";
 	handleQuestion(){
 
 	}
@@ -517,14 +564,16 @@ class handleQuestion{
 				}
 			}
 			String[] splitForGrade = question.split("@");
-			gradeString = splitForGrade[1]; // give the question every blank grade.
 
-			wholeQuestion = splitForGrade[0];
+			setGradeString(splitForGrade[1]); 
+
+			setFileInputQuestion(splitForGrade[0]);
 
 			String[] splitForAnswer = splitForGrade[0].split("#");
+			/*
 			for(int i = 0; i < splitForAnswer.length; i++){
 				System.out.println("splitForAnswer[" + i + "] is " + splitForAnswer[i]);
-			}
+			}*/
 
 			StringBuilder stringBuilderForAnswer = new StringBuilder();
 			StringBuilder stringBuilderForBlank = new StringBuilder();
@@ -547,7 +596,7 @@ class handleQuestion{
 					blank = blank + 1;
 				}	
 			}
-			stringForAnswer = new String(stringBuilderForAnswer); // connect the answer.
+			setAnswerString(new String(stringBuilderForAnswer)); // connect the answer.
 
 			StringBuilder stringBuilderForConnectQuestion = new StringBuilder();
 			for(int j = 0; j < splitForAnswer.length; j++){
@@ -566,6 +615,30 @@ class handleQuestion{
 
 		return connectQuestion;			
 	}// end method giveQuestion
+
+	public static void setFileInputQuestion(String input){
+		wholeQuestion = input;
+	}
+
+	public String getFileInputQuestion(){
+		return wholeQuestion;
+	}
+
+	public static void setGradeString(String newGradeString){
+		gradeString = newGradeString;
+	}
+
+	public static String getGradeString(){
+		return gradeString;
+	}
+
+	public static void setAnswerString(String newAnswerString){
+		stringForAnswer = newAnswerString;
+	}
+
+	public String getAnswerString(){
+		return stringForAnswer;
+	}
 
 	static String[] handleAnswer(String needSeparate){
 		String[] firstHandleAnswer = needSeparate.split(","); // First we use , to devide the every blank answer.
@@ -588,7 +661,7 @@ class handleQuestion{
 			}		
 		}
 		
-		String[] gradeArray = gradeString.split(","); // Use the grade string, and ready to give point.
+		String[] gradeArray = getGradeString().split(","); // Use the grade string, and ready to give point.
 		int[] gradeIntArray = new int[gradeArray.length];
 		for (int i = 0; i < gradeArray.length; i++){
 			gradeIntArray[i] = Integer.parseInt(gradeArray[i]);
@@ -623,9 +696,14 @@ class handleQuestion{
 		return stringForResult;
 	}// end method correspondAnswer
 
-	static void setGrade(int grade1){
+	public static void setGrade(int grade1){
 		int oldGrade = Integer.parseInt(grade);
 		int newGrade = oldGrade + grade1;
 		grade = String.valueOf(newGrade);
 	}// emd method setGrade
+
+	public String getGrade(){
+		return grade;
+	}
+
 }// end class handleQuestion
