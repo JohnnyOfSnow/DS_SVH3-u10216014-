@@ -25,10 +25,12 @@ import java.util.Date;
 public class ChooseApplet extends JApplet {
 	private JTextField textField;
 	private JTextField textField_1;
+	private JTextField textField_2;
 	JButton btnNewButton = new JButton("\u4E0A\u6B21\u4F5C\u7B54\u89E3\u8AAA");
 	JButton btnNewButton_1 = new JButton("\u958B\u59CB\u4F5C\u7B54");
 	JRadioButton rdbtnNewRadioButton = new JRadioButton("\u96A8\u6A5F\u51FA\u984C",true);
 	JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("\u9806\u5E8F\u51FA\u984C",false);
+	JTextArea textArea;
 	static JFrame frame;
 	static int mode = 1;
 	
@@ -41,7 +43,7 @@ public class ChooseApplet extends JApplet {
 		// Add the applet to the frame.
 		frame.add(applet);
 		// Display the frame.
-		frame.setSize(419,400);
+		frame.setSize(727,400);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -49,7 +51,7 @@ public class ChooseApplet extends JApplet {
 
 	// Owing to Applet life-cycle, the method will automatically be invoked.
 	public void init(){
-		resize(419,400); // Set the applet size, or the window is too small initially.
+		resize(727,400); // Set the applet size, or the window is too small initially.
 	}
 
 
@@ -67,7 +69,7 @@ public class ChooseApplet extends JApplet {
 		panel.add(lblNewLabel);
 		
 		JLabel lblNewLabel_1 = new JLabel("1.\u82E5\u60A8\u662F\u7B2C1\u6B21\u4F7F\u7528\u7A0B\u5F0F\u8ACB\u5728\u4E0B\u65B9\u7684\u7A7A\u683C\u4E2D\uFF0C\u5206\u5225\u9375\u5165\u60A8\u7684\u540D\u5B57\u53CA\u5B78\u865F\r\n   ");
-		lblNewLabel_1.setBounds(20, 59, 372, 30);
+		lblNewLabel_1.setBounds(20, 59, 425, 30);
 		panel.add(lblNewLabel_1);
 		
 		JLabel lblNewLabel_2 = new JLabel("2.\u82E5\u60A8\u5DF2\u7D93\u958B\u555F\u904E\u672C\u7A0B\u5F0F\u800C\u4E14\u7B54\u904E\u984C\uFF0C\u8ACB\u6309\u4E0B\u4E0A\u6B21\u4F5C\u7B54\u89E3\u8AAA");
@@ -110,6 +112,36 @@ public class ChooseApplet extends JApplet {
 		lblNewLabel_7.setBounds(30, 265, 46, 15);
 		panel.add(lblNewLabel_7);
 		
+		JLabel lblNewLabel_8 = new JLabel("\u51FA\u984C\u65B9\u5F0F\u53EF\u9078\u64C7\u96A8\u6A5F\u6216\u662F\u9806\u5E8F");
+		lblNewLabel_8.setBounds(186, 87, 233, 15);
+		panel.add(lblNewLabel_8);
+		
+		JLabel lblNewLabel_9 = new JLabel("\u8A2D\u5B9A\u5340\uFF1A");
+		lblNewLabel_9.setBounds(420, 207, 76, 15);
+		panel.add(lblNewLabel_9);
+		
+		JLabel lblNewLabel_10 = new JLabel("\u984C\u76EE\u4F86\u6E90\uFF1A");
+		lblNewLabel_10.setBounds(443, 243, 76, 15);
+		panel.add(lblNewLabel_10);
+		
+		textArea = new JTextArea();
+		textArea.setBounds(529, 238, 188, 25);
+		panel.add(textArea);
+		
+		JLabel lblNewLabel_11 = new JLabel("\u51FA\u5E7E\u984C\uFF1A");
+		lblNewLabel_11.setBounds(443, 282, 63, 15);
+		panel.add(lblNewLabel_11);
+		
+		textField_2 = new JTextField();
+		textField_2.setBounds(528, 279, 188, 21);
+		panel.add(textField_2);
+		textField_2.setColumns(10);
+		
+		JLabel lblNewLabel_12 = new JLabel("\u6CE8\u610F\uFF1A\u984C\u76EE\u61C9\u653E\u65BC\u8207\u7A0B\u5F0F\u76F8\u540C\u7684\u76EE\u9304\u4E0B");
+		lblNewLabel_12.setBounds(449, 327, 267, 15);
+		panel.add(lblNewLabel_12);
+
+		
 		
 		btnNewButton_1.setBounds(40, 313, 121, 43);
 		panel.add(btnNewButton_1);
@@ -125,10 +157,10 @@ public class ChooseApplet extends JApplet {
 		ButtonGroup group = new ButtonGroup(); // A button group we use in order to tight two radioButton.
 		group.add(rdbtnNewRadioButton);
 		group.add(rdbtnNewRadioButton_1);
-		
+		/*
 		JLabel lblNewLabel_8 = new JLabel("\u51FA\u984C\u65B9\u5F0F\u53EF\u9078\u64C7\u96A8\u6A5F\u6216\u662F\u9806\u5E8F");
 		lblNewLabel_8.setBounds(159, 87, 233, 15);
-		panel.add(lblNewLabel_8);
+		panel.add(lblNewLabel_8);*/
 
 		btnNewButton.addActionListener(new ButtonListener()); // Register listener.
 		btnNewButton_1.addActionListener(new ButtonListener()); // Register listener.
@@ -177,15 +209,30 @@ public class ChooseApplet extends JApplet {
 			String check = null;
 			String schoolNumber = String.valueOf(textField.getText());
 			String name = String.valueOf(textField_1.getText()); 
+			String fileQuestion = textArea.getText();
+			String amount = textField_2.getText();
 			if(schoolNumber.equals(check)){
 				System.out.println("Checked.");
 			}else if(name.equals(check)){
 				System.out.println("Checked.");
 			}else{
 				System.out.println("Not Checked.");
-				frame.dispose();
-				QuestionApplet a = new QuestionApplet(schoolNumber, name, mode);
-				a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				
+				File file = new File(fileQuestion);
+				if(file.exists()){
+					try {
+						frame.dispose();
+						QuestionApplet a = new QuestionApplet(schoolNumber, name, mode, fileQuestion, amount);
+						a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+					} catch (Exception e) {
+						frame.dispose();
+						
+					}
+				}else{
+
+				}
+				
 			}		
 		}
 	}// end inner class ButtonListener
@@ -212,14 +259,18 @@ class QuestionApplet extends JFrame {
 	static int setMode = 1; // 1 is random mode, 2 is sequence mode.
 	static boolean end = false;
 	static String fileName = "name.txt";
+	static String realAmount;
+	static String fileQuestionInUse = "exam1.txt";
 
 	/**
 	 * Create the applet.
 	 */
-	public QuestionApplet(String schoolNumber, String name, int mode){
-
+	public QuestionApplet(String schoolNumber, String name, int mode, String fileQuestion, String amount){
 		super("A Question window.");
-		
+
+		setFileQuestionInUse(fileQuestion);
+		setAmount(amount);
+
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
@@ -298,7 +349,7 @@ class QuestionApplet extends JFrame {
 		lblNewLabel_9.setBounds(10, 113, 85, 15);
 		panel.add(lblNewLabel_9);
 		
-		lblNewLabel_10 = new JLabel("\u9019\u88E1\u986F\u793A\u984C\u6578");
+		lblNewLabel_10 = new JLabel(getAmount());
 		lblNewLabel_10.setBounds(91, 113, 115, 15);
 		panel.add(lblNewLabel_10);
 		
@@ -310,7 +361,7 @@ class QuestionApplet extends JFrame {
 		lblNewLabel_12.setBounds(10, 138, 85, 15);
 		panel.add(lblNewLabel_12);
 		
-		lblNewLabel_13 = new JLabel("\u9019\u88E1\u986F\u793A\u7B54\u7684\u6578\u91CF");
+		lblNewLabel_13 = new JLabel("0");
 		lblNewLabel_13.setBounds(91, 138, 123, 15);
 		panel.add(lblNewLabel_13);
 		
@@ -375,7 +426,7 @@ class QuestionApplet extends JFrame {
 					chooseQuestion = (int)(Math.random() * capacityForInt);
 				}
 				handleQuestion test1 = new handleQuestion();
-				textArea.setText(test1.giveQuestion(chooseQuestion));
+				textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -387,7 +438,7 @@ class QuestionApplet extends JFrame {
 				setCapacity();
 
 				handleQuestion test1 = new handleQuestion();
-				textArea.setText(test1.giveQuestion(chooseQuestion));
+				textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -454,15 +505,16 @@ class QuestionApplet extends JFrame {
 	static void establishFile(String fileName){
 		File file = new File(fileName);
 		if(!file.exists()){
-    		try {
-        		file.createNewFile(); // create a file and the file name is required by the method's parameter.
+			try {
+				file.createNewFile(); // create a file and the file name is required by the method's parameter.
 
-    		} catch (IOException e) {
-        		// TODO Auto-generated catch block
-        		e.printStackTrace();
-    		}
-    	}else{
-    	}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else{
+			
+		}
 	}// end method establishFile.
 
 	static void requireFileWriteData(String fileName, String data1){
@@ -489,6 +541,31 @@ class QuestionApplet extends JFrame {
 		String readyInputTofile = new String(stringBuilderForConnectStringForInput);
 		return readyInputTofile;
 	}// end method connectStringForInputFile.
+
+	static void setAmount(String newAmount){
+		realAmount = newAmount;
+	}
+
+	static String getAmount(){
+		return realAmount;
+	}
+
+	static void setFileQuestionInUse(String newQuestionFile){
+		fileQuestionInUse = newQuestionFile;
+	}
+
+	static String getFileQuestionInUse(){
+		return fileQuestionInUse;
+	}
+
+	static void recordNumberOfQuestionAnswered(){
+		String oldRemainQuestion = lblNewLabel_13.getText();
+		int oldRemainQuestionForInt = Integer.parseInt(oldRemainQuestion);
+		oldRemainQuestionForInt = oldRemainQuestionForInt + 1;
+		String newRemainQuestion = String.valueOf(oldRemainQuestionForInt);
+		
+		lblNewLabel_13.setText(newRemainQuestion);
+	}
 
 	// A class is responsible for action presentation.
 	private class ButtonListener implements ActionListener{
@@ -527,27 +604,40 @@ class QuestionApplet extends JFrame {
 						requireFileWriteData(getFileName(), combinatedString);
 						System.out.println("you check the next button");
 						System.out.println("Now you answer the next question.");
+						recordNumberOfQuestionAnswered();
+						String checkAmount = getAmount();
+						String checkRemain = lblNewLabel_13.getText();
+
 						if(setMode == 1){
-							
-							textArea.setText(test1.giveQuestion(getRandom()));
-							textArea_1.setText("");
-							textArea_2.setText("");
-							isNext = 0;
-							isCheck = 1;
-						}else if(setMode == 2){
-							
-							chooseQuestion = chooseQuestion + 1;
-							if(checkCapacity(chooseQuestion)){
-								textArea.setText(test1.giveQuestion(chooseQuestion));
-								textArea_1.setText("");
-								textArea_2.setText("");
-								isNext = 0;
-								isCheck = 1;
-							}else{
+							if(checkAmount.equals(checkRemain)){
+								String gradeForInputInFile = connectStringForInputFile("Finally, you get ",test1.getGrade());
+								requireFileWriteData(getFileName(), gradeForInputInFile);
 								textArea.setText("All question have answered");
 								textArea_1.setText("Please click the analysis button.");
 								textArea_2.setText("Please click the analysis button.");
 								end = true;
+							}else{
+								textArea.setText(test1.giveQuestion(getRandom(), getFileQuestionInUse()));
+								textArea_1.setText("");
+								textArea_2.setText("");
+								isNext = 0;
+								isCheck = 1;
+							}							
+						}else if(setMode == 2){						
+							chooseQuestion = chooseQuestion + 1;
+							if(checkAmount.equals(checkRemain)){
+								String gradeForInputInFile = connectStringForInputFile("Finally, you get ",test1.getGrade());
+								requireFileWriteData(getFileName(), gradeForInputInFile);
+								textArea.setText("All question have answered");
+								textArea_1.setText("Please click the analysis button.");
+								textArea_2.setText("Please click the analysis button.");
+								end = true;							
+							}else{					
+								textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
+								textArea_1.setText("");
+								textArea_2.setText("");
+								isNext = 0;
+								isCheck = 1;
 							}
 						
 						}else{
@@ -598,7 +688,7 @@ class handleQuestion{
 
 	}
 
-	public static String giveQuestion(int number){
+	public static String giveQuestion(int number, String fileQuestion){
 
 		String question = "";
 		String connectQuestion = ""; 
@@ -607,7 +697,7 @@ class handleQuestion{
 		BufferedReader br = null;
 
 		try {
-			fr = new FileReader("exam1.txt"); // A file holds the question.
+			fr = new FileReader(fileQuestion); // A file holds the question.
 			br = new BufferedReader(fr);
 			String data;
 			StringBuilder stringBuilderForQuestion = new StringBuilder();
