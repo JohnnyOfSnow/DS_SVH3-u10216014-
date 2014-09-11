@@ -127,6 +127,7 @@ public class ChooseApplet extends JApplet {
 		textArea = new JTextArea();
 		textArea.setBounds(529, 238, 188, 25);
 		panel.add(textArea);
+		textArea.setText("exam1.txt");
 		
 		JLabel lblNewLabel_11 = new JLabel("\u51FA\u5E7E\u984C\uFF1A");
 		lblNewLabel_11.setBounds(443, 282, 63, 15);
@@ -217,22 +218,40 @@ public class ChooseApplet extends JApplet {
 				System.out.println("Checked.");
 			}else{
 				System.out.println("Not Checked.");
-				
+				FileReader fr = null;
+				BufferedReader br = null;
 				File file = new File(fileQuestion);
 				if(file.exists()){
 					try {
-						frame.dispose();
-						QuestionApplet a = new QuestionApplet(schoolNumber, name, mode, fileQuestion, amount);
-						a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+						try {
+							fr = new FileReader(fileQuestion); // A file holds the question.
+							br = new BufferedReader(fr);
+							String data;
+							data = br.readLine();
+							String[] isExam = data.split(",");
+							String checkExam = "exam";
+							int amountForCheck = Integer.parseInt(isExam[1]);
+							int amountUserInput = Integer.parseInt(amount);
 
-					} catch (Exception e) {
-						frame.dispose();
+							if(isExam[0].equals(checkExam) && amountUserInput <= amountForCheck && amountUserInput > 0){
+								frame.dispose();
+								QuestionApplet a = new QuestionApplet(schoolNumber, name, mode, fileQuestion, amount, amountForCheck);
+								a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+							}
+						}catch(IOException e){}
+						finally{
+							try {
+								br.close(); // Because the br = new BufferedReader(fr); , we close the br.
+							}
+							catch(IOException e){}
+						} // end finally
 						
-					}
+					} catch (Exception e) {
+						frame.dispose();	
+					}				
 				}else{
-
-				}
-				
+					// File not exist.
+				}		
 			}		
 		}
 	}// end inner class ButtonListener
@@ -261,11 +280,12 @@ class QuestionApplet extends JFrame {
 	static String fileName = "name.txt";
 	static String realAmount;
 	static String fileQuestionInUse = "exam1.txt";
+	static int currentQuestion = 1;
 
 	/**
 	 * Create the applet.
 	 */
-	public QuestionApplet(String schoolNumber, String name, int mode, String fileQuestion, String amount){
+	public QuestionApplet(String schoolNumber, String name, int mode, String fileQuestion, String amount, int newCapacity){
 		super("A Question window.");
 
 		setFileQuestionInUse(fileQuestion);
@@ -389,7 +409,7 @@ class QuestionApplet extends JFrame {
 		lblNewLabel_21.setBounds(10, 163, 123, 15);
 		panel.add(lblNewLabel_21);
 		
-		lblNewLabel_22 = new JLabel("\u9019\u88E1\u986F\u793A\u5206\u6578");
+		lblNewLabel_22 = new JLabel("0");
 		lblNewLabel_22.setBounds(64, 188, 123, 15);
 		panel.add(lblNewLabel_22);
 		
@@ -419,30 +439,24 @@ class QuestionApplet extends JFrame {
 		if(mode == 1){
 			lblNewLabel_5.setText("Random mode");
 			setMode = 1;
-			try {
-				setCapacity();
-				chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
-				while(chooseQuestion == 0) {
-					chooseQuestion = (int)(Math.random() * capacityForInt);
-				}
-				handleQuestion test1 = new handleQuestion();
-				textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			setCapacity(newCapacity);
+			chooseQuestion = (int)(Math.random() * capacityForInt) + 1; // choose a question for random.
+			while(chooseQuestion == 0) {
+				chooseQuestion = (int)(Math.random() * capacityForInt);
 			}
+			handleQuestion test1 = new handleQuestion();
+			textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse(), currentQuestion));
+			currentQuestion = currentQuestion + 1;
+			
 		}else if(mode == 2){
 			lblNewLabel_5.setText("Sequence mode");
 			setMode = 2;
-			try {
-				setCapacity();
-
-				handleQuestion test1 = new handleQuestion();
-				textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			setCapacity(newCapacity);
+			handleQuestion test1 = new handleQuestion();
+			textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse(), currentQuestion));
+			currentQuestion = currentQuestion + 1;
+			
 		}else{
 			lblNewLabel_5.setText("No mode");
 			setMode = 1;
@@ -453,21 +467,8 @@ class QuestionApplet extends JFrame {
 		btnNewButton_2.addActionListener(new ButtonListener()); // Register listener.
 	}// end constructer (String schoolNumber, String name, int mode)
 
-	public void setCapacity() throws Exception{
-		java.io.File file = new java.io.File("capacity.txt"); // A file use to tell the program how many question do we have.
-		if (file.exists()) {
-			Scanner input = new Scanner(file);
-			
-			String capacityForString = " ";
-			while (input.hasNext()) {
-				capacityForString = input.next(); // Read items
-			}
-			capacityForInt = Integer.parseInt(capacityForString); // String to integer.
-			realCapacity = capacityForInt;
-			input.close(); // Close the file.		
-		} else {
-			dispose();
-		}	
+	public void setCapacity(int newCapacity){
+		realCapacity = newCapacity;
 	}// end method setCapacity()
 
 	public int getCapacity(){
@@ -567,6 +568,14 @@ class QuestionApplet extends JFrame {
 		lblNewLabel_13.setText(newRemainQuestion);
 	}
 
+	static void setCurrentQuestion(int newCurrentQuestion){
+		currentQuestion = newCurrentQuestion;
+	}
+
+	static int getCurrentQuestion(){
+		return currentQuestion;
+	}
+
 	// A class is responsible for action presentation.
 	private class ButtonListener implements ActionListener{
 		
@@ -617,7 +626,10 @@ class QuestionApplet extends JFrame {
 								textArea_2.setText("Please click the analysis button.");
 								end = true;
 							}else{
-								textArea.setText(test1.giveQuestion(getRandom(), getFileQuestionInUse()));
+								int useCurrentQuestion = getCurrentQuestion();
+								textArea.setText(test1.giveQuestion(getRandom(), getFileQuestionInUse(), useCurrentQuestion));
+								useCurrentQuestion = useCurrentQuestion + 1;
+								setCurrentQuestion(useCurrentQuestion);
 								textArea_1.setText("");
 								textArea_2.setText("");
 								isNext = 0;
@@ -632,8 +644,11 @@ class QuestionApplet extends JFrame {
 								textArea_1.setText("Please click the analysis button.");
 								textArea_2.setText("Please click the analysis button.");
 								end = true;							
-							}else{					
-								textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse()));
+							}else{
+								int useCurrentQuestion = getCurrentQuestion();			
+								textArea.setText(test1.giveQuestion(chooseQuestion, getFileQuestionInUse(), useCurrentQuestion));
+								useCurrentQuestion = useCurrentQuestion + 1;
+								setCurrentQuestion(useCurrentQuestion);	
 								textArea_1.setText("");
 								textArea_2.setText("");
 								isNext = 0;
@@ -688,7 +703,7 @@ class handleQuestion{
 
 	}
 
-	public static String giveQuestion(int number, String fileQuestion){
+	public static String giveQuestion(int number, String fileQuestion, int time){
 
 		String question = "";
 		String connectQuestion = ""; 
@@ -703,6 +718,8 @@ class handleQuestion{
 			StringBuilder stringBuilderForQuestion = new StringBuilder();
 			int index = 1;
 			int times = 1;
+			data = br.readLine();
+			data = br.readLine();
 				
 			while (((data = br.readLine()) != null) && (times <= number)) {
 				if (data.equals("-")) {
@@ -719,9 +736,12 @@ class handleQuestion{
 			}
 			String[] splitForGrade = question.split("@");
 
-			setGradeString(splitForGrade[1]); 
+			setGradeString(splitForGrade[1]);
+			StringBuilder  stringBuilderForFileInputQuestion = new StringBuilder();
+			stringBuilderForFileInputQuestion.append("The " + time + " Question: \r\n"  + splitForGrade[0]);
+			String saveFileInputQuestion = new String(stringBuilderForFileInputQuestion);
 
-			setFileInputQuestion(splitForGrade[0]);
+			setFileInputQuestion(saveFileInputQuestion);
 
 			String[] splitForAnswer = splitForGrade[0].split("#");
 			/*
@@ -753,6 +773,7 @@ class handleQuestion{
 			setAnswerString(new String(stringBuilderForAnswer)); // connect the answer.
 
 			StringBuilder stringBuilderForConnectQuestion = new StringBuilder();
+			stringBuilderForConnectQuestion.append("The " + time + " Question: \r\n");
 			for(int j = 0; j < splitForAnswer.length; j++){
 				stringBuilderForConnectQuestion.append(splitForAnswer[j]);
 			}
