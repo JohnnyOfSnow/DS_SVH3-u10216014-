@@ -170,17 +170,6 @@ public class ChooseApplet extends JApplet {
 		rdbtnNewRadioButton_1.addActionListener(new ButtonListener()); // Register listener.
 	}// end constructer ChooseApplet()
 
-	static boolean[] record;
-
-	static{
-		Ex_staticInitializationBlock object = new Ex_staticInitializationBlock(3);
-		int initializationNumber = object.getCapacity() + 1;
-		record = new boolean[initializationNumber];
-		for(int i = 0; i < record.length; i++){
-			record[i] = false;
-		}
-		
-	}
 
 
 	public static void setCheckArrayForRandomMode(int newCapacity){
@@ -717,7 +706,7 @@ class QuestionApplet extends JFrame {
 				} // end if for whether all questions have answered.	
 			}else if(e.getSource() == btnNewButton_2){
 				if(end){
-					
+
 				}
 
 			}else{
@@ -805,7 +794,8 @@ class handleQuestion{
 			String stringforAddQuestionGrade = new String(stringBuilderforAddQuestionGrade);
 
 			StringBuilder  stringBuilderForFileInputQuestion = new StringBuilder();
-			stringBuilderForFileInputQuestion.append("The " + time + " Question: \r\n"  + splitForGrade[0] + "\r\n" + stringforAddQuestionGrade);
+			stringBuilderForFileInputQuestion.append("------------------------------------------------------\r\nThe " + time + 
+				" Question: \r\n"  + splitForGrade[0] + "\r\n" + stringforAddQuestionGrade);
 			String saveFileInputQuestion = new String(stringBuilderForFileInputQuestion);
 
 			setFileInputQuestion(saveFileInputQuestion);
